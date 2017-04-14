@@ -1,0 +1,42 @@
+{
+  "name": "redux-optimistic-thunk",
+  "version": "0.0.8",
+  "description": "A redux-thunk like middleware with optimistic UI supported",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start-cli": "babel-node example/cli/main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/otakustay/redux-optimistic-thunk.git"
+  },
+  "keywords": [
+    "redux",
+    "thunk",
+    "middleware",
+    "redux-middleware",
+    "flux",
+    "optimistic-ui",
+    "optimistic"
+  ],
+  "author": "otakustay",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/otakustay/redux-optimistic-thunk/issues"
+  },
+  "homepage": "https://github.com/otakustay/redux-optimistic-thunk#readme",
+  "dependencies": {
+    "redux": "^3.6.0",
+    "redux-thunk": "^2.2.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.24.1",
+    "babel-plugin-transform-es2015-modules-umd": "^6.24.1",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-es2015-rollup": "^3.0.0",
+    "babel-preset-stage-0": "^6.24.1",
+    "chalk": "^1.1.3"
+  }
+}
