@@ -1,0 +1,10 @@
+{
+    "files": [
+        "src/**",
+        "example/**",
+        "!example/*/dist/**"
+    ],
+    "htmlcs": {
+        "style-disabled": false
+    }
+}

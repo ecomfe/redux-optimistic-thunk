@@ -165,3 +165,12 @@ npm run start-cli
 ```
 
 See [test/cli/main.js](test/cli/main.js) for detail code.
+
+Running react example will provide you a more practical app:
+
+```shell
+npm install
+npm run start-react
+```
+
+Follow the instructions on webpage to test optimistic UI effects.

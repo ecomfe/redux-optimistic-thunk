@@ -1,0 +1,11 @@
+{
+    "presets": ["react", "stage-0"],
+    "plugins": [
+        "react-require",
+        "transform-es2015-modules-umd",
+        ["transform-rename-import", {"react": "react/dist/react.min"}]
+    ],
+    "ignore": [
+        "esl.js"
+    ]
+}
