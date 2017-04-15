@@ -5,8 +5,6 @@
  * @author otakustay
  */
 
-import thunk from 'redux-thunk';
-
 let toString = Object.prototype.toString;
 
 let isOptimisticAction = action => {
@@ -37,7 +35,7 @@ let isKnownActionType = (() => {
 
 let isPlainAction = action => toString.call(action) === '[object Object]' && !isKnownActionType(action.type);
 
-let optimisticThunk = ({dispatch, getState}) => {
+export let optimisticThunk = extraArgument => ({dispatch, getState}) => {
     // The last save point to rollback to
     let savePoint = null;
     let dispatchedActions = [];
@@ -112,11 +110,10 @@ let optimisticThunk = ({dispatch, getState}) => {
             let isOptimisticStateRollbacked = false;
 
             let actualDispatch = action => {
-
                 // Any sync actions flush immediately, any actions after rollback are treated as simple actions
                 if (!isActualThunkReturned || isOptimisticStateRollbacked) {
                     saveActionOnDemand(action, false, transactionId);
-                    return next(action);
+                    return action ? next(action) : null;
                 }
 
                 // Rollback optimistic state on first async dispatch
@@ -125,7 +122,7 @@ let optimisticThunk = ({dispatch, getState}) => {
                 rollback(transactionId);
 
                 saveActionOnDemand(action, false, transactionId);
-                return next(action);
+                return action ? next(action) : null;
             };
 
             let optimisticDispatch = action => {
@@ -142,27 +139,20 @@ let optimisticThunk = ({dispatch, getState}) => {
 
             let [actualThunk, optimisticThunk] = action;
             // First call actual thunk to ensure all sync actions are flushed
-            let returnValue = actualThunk(actualDispatch, getState);
+            let returnValue = actualThunk(actualDispatch, getState, extraArgument);
             isActualThunkReturned = true;
             // Then create a save point if required, later dispatch in actual thunk will rollback to save point
             if (!savePoint) {
                 savePoint = getState();
             }
             // Then call optimistic thunk to create optimistic state
-            optimisticThunk(optimisticDispatch, getState);
+            optimisticThunk(optimisticDispatch, getState, extraArgument);
             isOptimisticThunkReturned = true;
             // The return value of actual thunk should be the return value of this mdidleware
             return returnValue;
         };
     };
 };
-
-export {optimisticThunk as standalone};
-
-// Merge 2 middlewares to 1 middleware
-let mergeMiddleware = (x, y) => store => next => x(store)(y(store)(next));
-
-export default extraArgument => mergeMiddleware(optimisticThunk, thunk.withExtraArgument(extraArgument));
 
 export let createOptimisticReducer = nextReducer => (state, action) => {
     if (state.optimistic === undefined) {

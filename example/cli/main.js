@@ -8,7 +8,7 @@
 /* eslint-disable no-console */
 
 import {createStore, applyMiddleware} from 'redux';
-import optimisticThunk, {createOptimisticReducer} from '../../src/index';
+import {optimisticThunk, createOptimisticReducer} from '../../src/index';
 import chalk from 'chalk';
 
 let reducer = (state, action) => (action.type === 'PUSH' ? {...state, items: state.items.concat(action.value)} : state);

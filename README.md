@@ -34,7 +34,7 @@ Use of redux-optimistic-thunk is quite simple, you should apply the provided mid
 
 ```javascript
 import {createStore, applyMiddleware} from 'redux';
-import optimisticThunk, {createOptimisticReducer} from 'redux-optimistic-thunk';
+import {optimisticThunk, createOptimisticReducer} from 'redux-optimistic-thunk';
 
 let reducer = (state, action) => (action.type === 'PUSH' ? state.concat(action.value) : state);
 let store = createStore(
@@ -44,26 +44,7 @@ let store = createStore(
 );
 ```
 
-Note that different from redux-thunk, the export of redux-optimistic-thunk is a function which return a middleware, so instead of `applyMiddleware(optimisticThunk)`, you should have a extra invocation `applyMiddleware(optimisticThunk())`, you can provide an `extraArgument` on invocation.
-
-The default export comes with redux-thunk bundled so you are not required to apply redux-thunk anymore, if you want some other middleware between redux-optimistic-thunk and redux-thunk, use `standalone` named export instead:
-
-
-```javascript
-import {createStore, applyMiddleware} from 'redux';
-import thunk from 'redux-thunk';
-import logger from 'redux-logger';
-import {standalone as optimisticThunk, createOptimisticReducer} from 'redux-optimistic-thunk';
-
-let reducer = (state, action) => (action.type === 'PUSH' ? state.concat(action.value) : state);
-let store = createStore(
-    createOptimisticReducer(reducer),
-    [],
-    applyMiddleware(optimisticThunk(), logger, thunk) // Make sure optimisticThunk applies before thunk
-);
-```
-
-In order for redux-optimistic-thunk to work, it must be applied **before** redux-thunk, so the order of middleware is important.
+Note that different from redux-thunk, the export of redux-optimistic-thunk is a function which returns a middleware, so instead of `applyMiddleware(optimisticThunk)`, you should have a extra invocation `applyMiddleware(optimisticThunk())`, you can provide an `extraArgument` on invocation like `applyMiddleware(optimisticThunk(api))`.
 
 After middleware is applied, just wrap your reducer into the `createOptimisticReducer` function redux-optimistic-thunk provides, wrapped reducer adds optimistic state rollback ability to your store, it is a must.
 
@@ -110,11 +91,11 @@ let createTodo = todo => [
 ];
 ```
 
-It's simple, you just write 2 business logics, no extra properties to your plain action object, no transaction id and commit/revert signals.
+It's simple, you just write 2 blocks of business logic, no extra properties to your plain action object, no transaction id and commit/revert signals.
 
 ### Determine whether state is optimistic
 
-redux-optimistic-thunk adds a `optimistic` property to your state, this property is initialized as `false`.
+redux-optimistic-thunk adds an `optimistic` property to your state, this property is initialized as `false`.
 
 Whenever a plain object action is dispatched from an optimistic thunk, the `optimistic` property is set to `true`, it will return to `false` when all dispatched optimistic actions have been rollbacked, so it's possible to either use `getState().optimistic` in thunk/middleware or use `state.optimistic` in reducer to resolve whether the state is optimistic.
 
@@ -140,6 +121,26 @@ let createTodo = todo => [
 
 Since the actual thunk does not handle any errors from server response, it is possible that no async `dispatch` calls will be made if server returns a `50x` or `40x` response, in this case a optimistic pending todo will live in todo list forever, the entire application state is always optimistic.
 
+If - for some reason - you cannot dispatch any action asynchronously in actual thunk, just call `dispatch` function provided to actual thunk without any argument, this `dispatch` function can properly "swallow" `undefined` action and correctly rollback optimistic states:
+
+```javascript
+let createTodo = todo => [
+    async dispatch => {
+        try {
+            let createdTodo = await saveTodo(todo);
+
+            dispatch(newTodo(createdTodo));
+        }
+        catch (ex) {
+            // OK we don't want to handle errors, so just call dispatch with no argument
+            dispatch();
+        }
+    },
+
+    dispatch => dispatch(newTodo({...todo, pending: true}));
+];
+```
+
 ### The order of middleware
 
 Internally when redux-optimistic-thunk rollbacks your state and re-applies actions, instead of calling the global `dispatch` function it invokes the `next` function in middleware, so any middleware placed before redux-optimistic-thunk will not receive any re-applied action.
@@ -152,7 +153,7 @@ In order to rollback state and mark state as optimistic, redux-optimistic-thunk 
 
 ### Nested thunk
 
-redux-optimistic-thunk keeps in track of the first async call to `dispatch` function provided to actual thunk and will rollback optimistic thunk in this point, even the first call is to dispatch a nested thunk, the rollback will be landed, so any optimistic state produced from corresponding optimistic thunk will lost, this is currently by design.
+redux-optimistic-thunk keeps in track of the first async call to `dispatch` function provided to actual thunk and will rollback optimistic thunk in this point, even the first call is to dispatch a nested thunk (when combined with redux-thunk), the rollback will be landed, so any optimistic state produced from corresponding optimistic thunk will lost, this is currently by design.
 
 ## Run example
 
