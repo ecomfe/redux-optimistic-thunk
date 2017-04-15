@@ -1,0 +1,7 @@
+test/
+doc/
+coverage/
+.babelrc
+.fecsrc
+gulpfile.js
+yarn.lock

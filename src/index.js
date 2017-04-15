@@ -26,7 +26,7 @@ let knownActionTypes = {
 
 let isKnownActionType = (() => {
     let values = Object.keys(knownActionTypes).reduce(
-        (values, key) => Object.assign(values, {[knownActionTypes[key]]: true}),
+        (values, key) => ({...values, [knownActionTypes[key]]: true}),
         {}
     );
 
