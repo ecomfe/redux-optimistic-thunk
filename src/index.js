@@ -22,7 +22,8 @@ let uid = (() => {
 })();
 
 let knownActionTypes = {
-    rollback: '@@redux-optimistic-thunk/ROLLBACK'
+    rollback: '@@redux-optimistic-thunk/ROLLBACK',
+    mark: '@@redux-optimistic-thunk/MARK'
 };
 
 let isKnownActionType = (() => {
@@ -34,14 +35,22 @@ let isKnownActionType = (() => {
     return type => values.hasOwnProperty(type);
 })();
 
+let isPlainAction = action => toString.call(action) === '[object Object]' && !isKnownActionType(action.type);
+
 let optimisticThunk = ({dispatch, getState}) => {
     // The last save point to rollback to
     let savePoint = null;
     let dispatchedActions = [];
 
     let saveActionOnDemand = (value, optimistic, transactionId) => {
-        if (savePoint && toString.call(value) === '[object Object]' && !isKnownActionType(value.type)) {
+        if (savePoint && isPlainAction(value)) {
             dispatchedActions.push({value, optimistic, transactionId});
+        }
+    };
+
+    let markStateOptimisticOnDemand = action => {
+        if (isPlainAction(action) && !getState().optimistic) {
+            dispatch({type: knownActionTypes.mark});
         }
     };
 
@@ -79,6 +88,11 @@ let optimisticThunk = ({dispatch, getState}) => {
                 // here we just need to apply all middlewares **after** redux-optimistic-thunk,
                 // so use `next` instead of global `dispatch`
                 next(savedAction.value);
+
+                // Still mark state to optimistic if an optimistic action occurs
+                if (savedAction.optimistic && !getState().optimistic) {
+                    dispatch({type: knownActionTypes.mark});
+                }
             }
 
             savePoint = newSavePoint;
@@ -121,7 +135,9 @@ let optimisticThunk = ({dispatch, getState}) => {
 
                 saveActionOnDemand(action, true, transactionId);
 
-                return next(action);
+                let returnValue = next(action);
+                markStateOptimisticOnDemand(action);
+                return returnValue;
             };
 
             let [actualThunk, optimisticThunk] = action;
@@ -149,9 +165,16 @@ let mergeMiddleware = (x, y) => store => next => x(store)(y(store)(next));
 export default extraArgument => mergeMiddleware(optimisticThunk, thunk.withExtraArgument(extraArgument));
 
 export let createOptimisticReducer = nextReducer => (state, action) => {
-    if (action.type === knownActionTypes.rollback) {
-        return action.state;
+    if (state.optimistic === undefined) {
+        return {...state, optimistic: false};
     }
 
-    return nextReducer(state, action);
+    switch (action.type) {
+        case knownActionTypes.rollback:
+            return action.state;
+        case knownActionTypes.mark:
+            return state.optimistic ? state : {...state, optimistic: true};
+        default:
+            return nextReducer(state, action);
+    }
 };

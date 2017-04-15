@@ -59,7 +59,7 @@ let reducer = (state, action) => (action.type === 'PUSH' ? state.concat(action.v
 let store = createStore(
     createOptimisticReducer(reducer),
     [],
-    applyMiddleware(thunk, logger, optimisticThunk()) // Make sure optimisticThunk applies before thunk
+    applyMiddleware(optimisticThunk(), logger, thunk) // Make sure optimisticThunk applies before thunk
 );
 ```
 
@@ -69,7 +69,7 @@ After middleware is applied, just wrap your reducer into the `createOptimisticRe
 
 ### Write your thunk
 
-Suppose oure requirement is adding a newly submitted todo to list immediately (optimistic) before it is saved in server, however the optimistic todo cannot be deleted before it completes persistence:
+Suppose our requirement is adding a newly submitted todo to list immediately (optimistically) before it is saved in server, however the optimistic todo cannot be deleted before it completes persistence:
 
 ```javascript
 // action/todo.js
@@ -111,6 +111,12 @@ let createTodo = todo => [
 ```
 
 It's simple, you just write 2 business logics, no extra properties to your plain action object, no transaction id and commit/revert signals.
+
+### Determine whether state is optimistic
+
+redux-optimistic-thunk adds a `optimistic` proeprty to your state, this property is initialized as `false`.
+
+Whenever a plain object action is dispatched from an optimistic thunk, the `optimistic` property is set to `true`, it will return to `false` when all dispatched optimistic actions have been rollbacked, so it's possible to either use `getState().optimistic` in thunk/middleware or use `state.optimistic` in reducer to resolve whether the state is optimistic.
 
 ## Run example
 
