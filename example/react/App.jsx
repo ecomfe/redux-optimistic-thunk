@@ -9,15 +9,21 @@ import {PureComponent} from 'react';
 import {connect} from 'react-redux';
 import * as actions from './action';
 
-let itemLabelStyle = {
+let deleteLabelStyle = {
     float: 'right',
     cursor: 'pointer',
     color: '#0076ff'
 };
 
-let deleteLabel = props => <span style={itemLabelStyle} onClick={() => props.onDelete(props.id)}>delete</span>;
+let pendingLabelStyle = {
+    float: 'right',
+    cursor: 'default',
+    color: '#b3b3b3'
+};
 
-let pendingLabel = props => <span style={itemLabelStyle}>pending...</span>;
+let deleteLabel = props => <span style={deleteLabelStyle} onClick={() => props.onDelete(props.id)}>delete</span>;
+
+let pendingLabel = props => <span style={pendingLabelStyle}>pending...</span>;
 
 let item = props => (
     <li key={props.id} style={{padding: '4px 6px', borderBottom: '1px solid #ccc'}}>
@@ -85,12 +91,13 @@ class App extends PureComponent {
             fontSize: '16px'
         };
         return (
-            <div style={{width: '680px', margin: '0 auto'}}>
+            <div style={{width: '720px', margin: '0 auto'}}>
                 <div>
                     <span style={{display: 'inline-block', marginRight: '20px'}}>Set delay to:</span>
                     {delayRadio({value: 1, delay: this.props.delay, setDelay: ::this.setDelay})}
                     {delayRadio({value: 2, delay: this.props.delay, setDelay: ::this.setDelay})}
                     {delayRadio({value: 5, delay: this.props.delay, setDelay: ::this.setDelay})}
+                    {delayRadio({value: 10, delay: this.props.delay, setDelay: ::this.setDelay})}
                 </div>
                 <div style={{position: 'relative', margin: '20px 0'}}>
                     <input
@@ -108,14 +115,14 @@ class App extends PureComponent {
                 <div style={{marginTop: '40px', color: '#4d4d4d'}}>
                     <p>Try these steps to see how optimistic UI effects you app:</p>
                     <ol>
-                        <li>Keep delay default to 5s, submit a new item, you will see a pending item in top of list</li>
-                        <li>Quickly change delay to 2s, submit another item, another item appears on top</li>
-                        <li>Quickly delete some existing items, deleted item will have line-through effect</li>
-                        <li>Waiting for all item creation to finish, observe the order of items</li>
+                        <li>Keep delay default to 10s, submit a new item, you will see a pending item in top of list.</li>
+                        <li>Quickly change delay to 5s, submit another item, another item appears on top.</li>
+                        <li>Quickly delete some existing items, deleted item will have line-through effect.</li>
+                        <li>Wait for all item creation to finish, observe the order of items.</li>
                     </ol>
                     <p>
-                        Since a 2s-delayed item will response faster than a 5s-delayed one,
-                        the final order will be different from how you create them (optimistic order)
+                        Since a 5s-delayed item will response faster than a 10s-delayed one,
+                        the final order will be different from how you create them (optimistic order).
                     </p>
                 </div>
             </div>

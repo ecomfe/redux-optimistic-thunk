@@ -15,7 +15,7 @@ import uid from './uid';
 import App from './App.jsx';
 
 let initialState = {
-    delay: 5000,
+    delay: 10 * 1000,
     items: [
         {id: uid(), text: 'Buy a milk', pending: false, deleted: false},
         {id: uid(), text: 'Talk with Berry', pending: false, deleted: false},
