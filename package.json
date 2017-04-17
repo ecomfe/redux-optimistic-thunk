@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/otakustay/redux-optimistic-thunk.git"
+    "url": "git+https://github.com/ecomfe/redux-optimistic-thunk.git"
   },
   "keywords": [
     "redux",
@@ -27,9 +27,9 @@
   "author": "otakustay",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/otakustay/redux-optimistic-thunk/issues"
+    "url": "https://github.com/ecomfe/redux-optimistic-thunk/issues"
   },
-  "homepage": "https://github.com/otakustay/redux-optimistic-thunk#readme",
+  "homepage": "https://github.com/ecomfe/redux-optimistic-thunk#readme",
   "dependencies": {},
   "devDependencies": {
     "babel-cli": "^6.24.1",
