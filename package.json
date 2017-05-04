@@ -30,7 +30,9 @@
     "url": "https://github.com/ecomfe/redux-optimistic-thunk/issues"
   },
   "homepage": "https://github.com/ecomfe/redux-optimistic-thunk#readme",
-  "dependencies": {},
+  "dependencies": {
+    "redux-optimistic-manager": "^1.0.0"
+  },
   "devDependencies": {
     "babel-cli": "^6.24.1",
     "babel-core": "^6.24.1",
