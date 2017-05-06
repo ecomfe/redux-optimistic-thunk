@@ -1,6 +1,6 @@
 {
   "name": "redux-optimistic-thunk",
-  "version": "0.8.1",
+  "version": "1.0.0",
   "description": "A redux-thunk like middleware with optimistic UI supported",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
