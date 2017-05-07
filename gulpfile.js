@@ -14,6 +14,7 @@ let ROLLUP_CONFIG = {
     moduleName: 'reduxOptimisticThunk',
     useStrict: false,
     plugins: [
+        require('rollup-plugin-node-resolve')(),
         require('rollup-plugin-babel')()
     ]
 };
@@ -23,6 +24,7 @@ let ROLLUP_CONFIG_MODULE = {
     format: 'es',
     useStrict: false,
     plugins: [
+        require('rollup-plugin-node-resolve')(),
         require('rollup-plugin-babel')()
     ]
 };
