@@ -14,7 +14,7 @@ import chalk from 'chalk';
 let reducer = (state, action) => (action.type === 'PUSH' ? {...state, items: state.items.concat(action.value)} : state);
 
 let logger = ({getState}) => next => action => {
-    if (action.type !== 'PUSH' && !action.type.startsWith('@@redux-optimistic-thunk')) {
+    if (action.type !== 'PUSH' && !action.type.startsWith('@@optimistic')) {
         return next(action);
     }
 
@@ -22,7 +22,16 @@ let logger = ({getState}) => next => action => {
 
     let {optimistic, items} = getState();
     let prints = items.map(value => (value.includes('optimi') ? chalk.gray(value) : chalk.cyan(value)));
-    let prefix = optimistic ? '(optimistic)' : '    (actual)';
+    let prefix = ((optimistic, actionType) => {
+        switch (actionType) {
+            case '@@optimistic/ROLLBACK':
+                return '  (rollback)';
+            case '@@optimistic/MARK':
+                return '      (mark)';
+            default:
+                return optimistic ? '(optimistic)' : '    (actual)';
+        }
+    })(optimistic, action.type);
     console.log(prefix + ' ' + prints.join(' -> '));
 
     return returnValue;

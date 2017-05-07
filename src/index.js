@@ -17,14 +17,13 @@ let isOptimisticAction = action => {
 
 export let optimisticThunk = extraArgument => store => {
     let getState = store.getState;
-    let transaction = createOptimisticManager(store);
+    let {postAction, rollback} = createOptimisticManager(store);
 
     return next => action => {
-        let {postAction, postOptimisticAction, postExternalAction, rollback} = transaction(next);
+        let transactionId = {};
 
         if (!isOptimisticAction(action)) {
-            postExternalAction(action);
-            return next(action);
+            return next(postAction(action));
         }
 
         let isActualThunkReturned = false;
@@ -35,11 +34,11 @@ export let optimisticThunk = extraArgument => store => {
             // Rollback optimistic state on first async dispatch
             if (isActualThunkReturned && !isOptimisticStateRollbacked) {
                 isOptimisticStateRollbacked = true;
-                rollback();
+                rollback(transactionId, next);
             }
 
-            postAction(action);
-            return action ? next(action) : null;
+            // Allow call `dispatch` without argument to rollback optimistic actions
+            return action ? next(postAction(action)) : null;
         };
 
         let optimisticDispatch = action => {
@@ -47,8 +46,7 @@ export let optimisticThunk = extraArgument => store => {
                 throw new Error('Optimistic thunk must be a sync function');
             }
 
-            postOptimisticAction(action);
-            return next(action);
+            return next(postAction(action, transactionId));
         };
 
         let [actualThunk, optimisticThunk] = action;
