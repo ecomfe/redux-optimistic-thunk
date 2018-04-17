@@ -5,19 +5,20 @@
  * @author otakustay
  */
 
-let path = require('path');
-let HtmlWebpackPlugin = require('html-webpack-plugin');
+/* eslint-disable import/unambiguous, import/no-commonjs, import/no-nodejs-modules */
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    devtool: 'source-map',
+    mode: 'development',
     context: __dirname,
     entry: {
-        js: './index.js'
+        js: path.join(__dirname, 'index.js'),
     },
     output: {
         path: path.join(__dirname, 'dist'),
         publicPath: '/',
-        filename: 'app-[hash].js'
+        filename: 'app-[hash].js',
     },
     module: {
         rules: [
@@ -25,18 +26,18 @@ module.exports = {
                 test: /\.(js|jsx)$/,
                 exclude: /node_modules/,
                 use: [
-                    'babel-loader'
-                ]
-            }
-        ]
+                    'babel-loader',
+                ],
+            },
+        ],
     },
-    resolve: {
-        extensions: ['.js', '.jsx'],
-        modules: [
-            path.resolve(__dirname, '..', '..', 'node_modules'),
-            __dirname
-        ]
-    },
+    // resolve: {
+    //     extensions: ['.js', '.jsx'],
+    //     modules: [
+    //         path.resolve(__dirname, '..', '..', 'node_modules'),
+    //         __dirname,
+    //     ],
+    // },
     plugins: [new HtmlWebpackPlugin()],
     devServer: {
         contentBase: '.',
@@ -57,8 +58,8 @@ module.exports = {
             version: false,
             warnings: true,
             colors: {
-                green: '\u001b[32m'
-            }
-        }
-    }
+                green: '\u001b[32m',
+            },
+        },
+    },
 };

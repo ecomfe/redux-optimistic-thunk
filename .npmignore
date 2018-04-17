@@ -1,8 +1,0 @@
-test/
-doc/
-coverage/
-example/
-.babelrc
-.fecsrc
-gulpfile.js
-yarn.lock

@@ -7,20 +7,20 @@
 
 import {createOptimisticManager} from 'redux-optimistic-manager';
 
-let toString = Object.prototype.toString;
+const toString = Object.prototype.toString;
 
-let isOptimisticAction = action => {
-    let isArray = toString.call(action) === '[object Array]';
+const isOptimisticAction = action => {
+    const isArray = toString.call(action) === '[object Array]';
 
     return isArray && action.length === 2 && typeof action[0] === 'function' && typeof action[1] === 'function';
 };
 
-export let optimisticThunk = extraArgument => store => {
-    let getState = store.getState;
-    let {postAction, rollback} = createOptimisticManager(store);
+export const optimisticThunk = extraArgument => store => {
+    const getState = store.getState;
+    const {postAction, rollback} = createOptimisticManager(store);
 
     return next => action => {
-        let transactionId = {};
+        const transactionId = {};
 
         if (!isOptimisticAction(action)) {
             return next(postAction(action));
@@ -30,7 +30,7 @@ export let optimisticThunk = extraArgument => store => {
         let isOptimisticThunkReturned = false;
         let isOptimisticStateRollbacked = false;
 
-        let actualDispatch = action => {
+        const actualDispatch = action => {
             // Rollback optimistic state on first async dispatch
             if (isActualThunkReturned && !isOptimisticStateRollbacked) {
                 isOptimisticStateRollbacked = true;
@@ -41,7 +41,7 @@ export let optimisticThunk = extraArgument => store => {
             return action ? next(postAction(action)) : null;
         };
 
-        let optimisticDispatch = action => {
+        const optimisticDispatch = action => {
             if (isOptimisticThunkReturned) {
                 throw new Error('Optimistic thunk must be a sync function');
             }
@@ -49,9 +49,9 @@ export let optimisticThunk = extraArgument => store => {
             return next(postAction(action, transactionId));
         };
 
-        let [actualThunk, optimisticThunk] = action;
+        const [actualThunk, optimisticThunk] = action;
         // First call actual thunk to ensure all sync actions are flushed
-        let returnValue = actualThunk(actualDispatch, getState, extraArgument);
+        const returnValue = actualThunk(actualDispatch, getState, extraArgument);
         isActualThunkReturned = true;
         // Then call optimistic thunk to create optimistic state
         optimisticThunk(optimisticDispatch, getState, extraArgument);

@@ -6,23 +6,28 @@
  */
 
 /* eslint-disable no-console */
-
+import chalk from 'chalk';
 import {createStore, applyMiddleware} from 'redux';
 import {optimisticThunk, createOptimisticReducer} from '../../src/index';
-import chalk from 'chalk';
 
-let reducer = (state, action) => (action.type === 'PUSH' ? {...state, items: state.items.concat(action.value)} : state);
+const reducer = (state, action) => {
+    if (action.type === 'PUSH') {
+        return {...state, items: state.items.concat(action.value)};
+    }
 
-let logger = ({getState}) => next => action => {
+    return state;
+};
+
+const logger = ({getState}) => next => action => {
     if (action.type !== 'PUSH' && !action.type.startsWith('@@optimistic')) {
         return next(action);
     }
 
-    let returnValue = next(action);
+    const returnValue = next(action);
 
-    let {optimistic, items} = getState();
-    let prints = items.map(value => (value.includes('optimi') ? chalk.gray(value) : chalk.cyan(value)));
-    let prefix = ((optimistic, actionType) => {
+    const {optimistic, items} = getState();
+    const prints = items.map(value => (value.includes('optimi') ? chalk.gray(value) : chalk.cyan(value)));
+    const prefix = ((optimistic, actionType) => {
         switch (actionType) {
             case '@@optimistic/ROLLBACK':
                 return '  (rollback)';
@@ -37,16 +42,16 @@ let logger = ({getState}) => next => action => {
     return returnValue;
 };
 
-let store = createStore(
+const store = createStore(
     createOptimisticReducer(reducer),
     {items: []},
     applyMiddleware(optimisticThunk(), logger)
 );
 
-let delay = time => new Promise(resolve => setTimeout(resolve, time));
+const delay = time => new Promise(resolve => setTimeout(resolve, time));
 
-let main = async () => {
-    let slow = [
+const main = () => {
+    const slow = [
         async dispatch => {
             dispatch({type: 'PUSH', value: 'slow actual 1'});
             dispatch({type: 'PUSH', value: 'slow actual 2'});
@@ -59,9 +64,9 @@ let main = async () => {
         dispatch => {
             dispatch({type: 'PUSH', value: 'slow optimi 1'});
             dispatch({type: 'PUSH', value: 'slow optimi 2'});
-        }
+        },
     ];
-    let fast = [
+    const fast = [
         async dispatch => {
             dispatch({type: 'PUSH', value: 'fast actual 1'});
             dispatch({type: 'PUSH', value: 'fast actual 2'});
@@ -74,7 +79,7 @@ let main = async () => {
         dispatch => {
             dispatch({type: 'PUSH', value: 'fast optimi 1'});
             dispatch({type: 'PUSH', value: 'fast optimi 2'});
-        }
+        },
     ];
 
     store.dispatch(slow);
