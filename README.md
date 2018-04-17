@@ -174,3 +174,11 @@ npm run start-react
 ```
 
 Follow the instructions on webpage to test optimistic UI effects.
+
+## Change Log
+
+### 2.0.0
+
+- Refreshed build with single rollup.
+- The es module version is now located at `dist/index.mjs`.
+- Add `"sideEffects": false` to `package.json`.

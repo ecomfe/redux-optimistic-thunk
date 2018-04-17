@@ -1,14 +1,15 @@
 {
   "name": "redux-optimistic-thunk",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "description": "A redux-thunk like middleware with optimistic UI supported",
   "main": "dist/index.js",
-  "module": "dist/index.es.js",
+  "module": "dist/index.mjs",
+  "sideEffects": false,
   "scripts": {
     "start-cli": "cross-env NODE_ENV=example babel-node example/cli/main.js",
     "start-react": "cross-env NODE_ENV=example webpack-dev-server --config=example/react/webpack.config.js",
     "build": "cross-env NODE_ENV=production node rollup.js",
-    "lint": "eslint src example",
+    "lint": "eslint src example *.js",
     "prepublishOnly": "npm run lint && npm run build"
   },
   "repository": {
